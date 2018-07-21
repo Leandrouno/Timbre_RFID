@@ -55,13 +55,16 @@ void setup() {
         Serial.println(WiFi.localIP());    
         pinMode(BOTON_PIN, INPUT_PULLUP);
         pinMode(LED_BUILTIN, OUTPUT);
+        pinMode(RELE, OUTPUT);
         attachInterrupt(BOTON_PIN, BotonPresionado, FALLING);
         SPI.begin();      
         mfrc522.PCD_Init();   
         Serial.println("Aproxime La Tarjeta al Lector...");
         Serial.println();
-        digitalWrite(LED_RFID,LOW);
         pinMode(LED_RFID, OUTPUT);
+        digitalWrite(LED_RFID,LOW);
+        digitalWrite(RELE,HIGH);
+        
       } // Fin Setup
 
 
@@ -88,7 +91,7 @@ void BotonPresionado() {
         
 void mensaje_inicio (){
   
-              Serial.println("Iniciado...");
+                          Serial.println("Iniciado...");
                           Serial.println("Enviando Mensaje de Inicio ....."); 
                           bot.sendMessage(id_chat, iniciado);
                           Serial.println("Mensaje Enviado"); 
@@ -125,9 +128,11 @@ void manejo_tarjeta(){
                        contenido.substring(1) == "XX XX XX XX" ) {
                                                   Serial.println("Abiertoo--------------- Bienvenido !!!!");
                                                   Serial.println();
+                                                  digitalWrite(RELE,LOW);
                                                   digitalWrite(LED_RFID, HIGH);    
                                                   delay(1000);             
                                                   digitalWrite(LED_RFID, LOW); 
+                                                  digitalWrite(RELE,HIGH);
                                                                 } 
                    else{
                          Serial.println("Juiira Gatooo");
