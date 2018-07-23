@@ -1,38 +1,47 @@
 /*//////////////////////// CONEXION///////////////////////////////////
   
       Nodemcu       //     RFID-RC522 
-       D3 [1*]      GPIO-0      //     RST/Reset RST
-       D8 [2*]      GPIO-15     //     SPI SS  SDA[3] 
-       D7           GPIO-13     //     SPI MOSI MOSI
-       D6           GPIO-12     //     SPI MISO MISO
-       D5           GPIO-14     //     SPI SCK SCK   
-       D1          Pulsador Timbre
-       D2          LED Wifi Conectado    
+       D3 [1*]      GPIO-0      //     RST/Reset RST  //     Marron
+       D8 [2*]      GPIO-15     //     SPI SS  SDA[3] //     Amarillo 
+       D7           GPIO-13     //     SPI MOSI MOSI  //     Verde
+       D6           GPIO-12     //     SPI MISO MISO  //     Violeta
+       D5           GPIO-14     //     SPI SCK SCK    //     Gris
+       -----------------------------------------------
+       D1           Pulsador                         //   Celeste-Naranja
+       D0           Led_Rfid                         //   Blanco
+       D2           Led_Wifi
+       D4           Rele
+       3v                                            //  Rojo
+       GND                                           // Azul
 /////////////////////////////////////////////////////////////////////*/
+
+
 
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 #include <SPI.h>
 #include <MFRC522.h>
- 
+
 #define LED_RFID   D0
 #define BOTON_PIN D1
 #define LED_BUILTIN D2
-#define RST_PIN    D3    
+#define RST_PIN    D3 
+#define RELE       D4   
 #define SS_PIN     D8  
+ 
 
 MFRC522 mfrc522(SS_PIN, RST_PIN); 
 // Inicializamos la conexion WIFI con el Router
-char ssid[] = "XXXXXXXXX";     // el nombre de tu Red
-char password[] = "XXXXXXXXX"; // la clave de tu Red
-const char  id_chat[]="XXXXXX";
-const char respuesta[] = "Timbre" , iniciado[]="Sistema Iniciado....";
+char ssid[] = "xxxxxxxxxx";     // el nombre de tu Red
+char password[] = "xxxxxxxxx"; // la clave de tu Red
+const char  id_chat[]="xxxxxxxxxxx";
+const char respuesta[] = "Timbre" ,alerta[] = "ALERTA *** Intento de Acceso " , iniciado[]="Sistema Iniciado....";
 int BanderaInicio=0, BanderaBoton=0;
 volatile bool BanderaBotonPresionado = false;
 
 // Initialize Telegram BOT
-#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // el token de tu BOT, lo obtenemos de BotFather
+#define BOTtoken "xxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  // el token de tu BOT, lo obtenemos de BotFather
 
 
 WiFiClientSecure client;
@@ -102,13 +111,14 @@ void mensaje_inicio (){
 } // FIN Mensaje de inicio
         
 void envio_mensaje (){
-  
-            Serial.println("Enviando Mensaje.....");  
+                        digitalWrite(LED_RFID, HIGH);
+                        Serial.println("Enviando Mensaje.....");  
                         BanderaBotonPresionado = false;
                         bot.sendMessage(id_chat, respuesta);
                         Serial.println("Mensaje Enviado");
                         Serial.println(" "); 
                         BanderaBoton = 0;
+                        digitalWrite(LED_RFID, LOW);
                                          
 } // FIN Envio de Mensaje    
 
@@ -124,8 +134,8 @@ void manejo_tarjeta(){
                    Serial.println();
                    Serial.print("Mensaje : ");
                    contenido.toUpperCase();
-                   if (contenido.substring(1) == "XX XX XX XX" ||
-                       contenido.substring(1) == "XX XX XX XX" ) {
+                   if (contenido.substring(1) == "BA C3 F1 C5" ||
+                       contenido.substring(1) == "4F BB EC 57" ) {
                                                   Serial.println("Abiertoo--------------- Bienvenido !!!!");
                                                   Serial.println();
                                                   digitalWrite(RELE,LOW);
@@ -148,6 +158,9 @@ void manejo_tarjeta(){
                          digitalWrite(LED_RFID, HIGH);
                          delay(100);           
                          digitalWrite(LED_RFID, LOW); 
+                         Serial.println("Mensaje de intento de ingreso Fallido");
+                         Serial.println();
+                         bot.sendMessage(id_chat, alerta);
                         }
 
 }   // FIN MANEJO TARJETA
