@@ -10,7 +10,7 @@
        D1           Pulsador                         //   Celeste-Naranja
        D0           Led_Rfid                         //   Blanco
        D2           Led_Wifi
-       D4           Rele
+       D10           Rele
        3v                                            //  Rojo
        GND                                           // Azul
 /////////////////////////////////////////////////////////////////////*/
@@ -134,8 +134,13 @@ void manejo_tarjeta(){
                    Serial.println();
                    Serial.print("Mensaje : ");
                    contenido.toUpperCase();
-                   if (contenido.substring(1) == "BA C3 F1 C5" ||
-                       contenido.substring(1) == "4F BB EC 57" ) {
+                   if (
+                       contenido.substring(1) == "xx xx xx xx" || //Tarjeta Blanca
+                       contenido.substring(1) == "xx xx xx xx" || // Tarjeta Blanca
+                       contenido.substring(1) == "xx xx xx xx" || // Tarjeta Blanca 
+                       contenido.substring(1) == "xx xx xx xx" || //Llavero Azul
+                       contenido.substring(1) == "xx xx xx xx"    //Llavero Azul
+                       ) {
                                                   Serial.println("Abiertoo--------------- Bienvenido !!!!");
                                                   Serial.println();
                                                   digitalWrite(RELE,LOW);
