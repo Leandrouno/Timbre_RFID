@@ -48,6 +48,8 @@ WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
 void setup() {
+        pinMode(RELE, OUTPUT);
+        digitalWrite(RELE,HIGH);
         Serial.begin(9600);
         // Establecer el modo WiFi y desconectarse de un AP si fue Anteriormente conectada
         WiFi.mode(WIFI_STA);
@@ -64,7 +66,7 @@ void setup() {
         Serial.println(WiFi.localIP());    
         pinMode(BOTON_PIN, INPUT_PULLUP);
         pinMode(LED_BUILTIN, OUTPUT);
-        pinMode(RELE, OUTPUT);
+        
         attachInterrupt(BOTON_PIN, BotonPresionado, FALLING);
         SPI.begin();      
         mfrc522.PCD_Init();   
@@ -72,7 +74,7 @@ void setup() {
         Serial.println();
         pinMode(LED_RFID, OUTPUT);
         digitalWrite(LED_RFID,LOW);
-        digitalWrite(RELE,HIGH);
+        
         
       } // Fin Setup
 
