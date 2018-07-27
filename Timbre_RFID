@@ -7,10 +7,10 @@
        D6           GPIO-12     //     SPI MISO MISO  //     Violeta
        D5           GPIO-14     //     SPI SCK SCK    //     Gris
        -----------------------------------------------
-       D1           Pulsador                         //   Celeste-Naranja
+       D4           Pulsador                         //   Celeste-Naranja
        D0           Led_Rfid                         //   Blanco
        D2           Led_Wifi
-       D10           Rele
+       D1           Rele
        3v                                            //  Rojo
        GND                                           // Azul
 /////////////////////////////////////////////////////////////////////*/
@@ -24,10 +24,10 @@
 #include <MFRC522.h>
 
 #define LED_RFID   D0
-#define BOTON_PIN D1
+#define BOTON_PIN  D4
 #define LED_BUILTIN D2
 #define RST_PIN    D3 
-#define RELE       D4   
+#define RELE       D1   
 #define SS_PIN     D8  
  
 
