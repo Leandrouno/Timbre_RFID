@@ -13,6 +13,21 @@
        D1           Rele
        3v                                            //  Rojo
        GND                                           // Azul
+
+
+       --------------------------------------------
+
+              PINES DE LA PLAQUETA TIMBRE                     //               PINES DE BOT TELEGRAM                   
+ 
+       D3                               MARRON                //               D1     LED WIFI
+       D5                               GRIS                  //               D2     PUERTA 2    
+       D6                               VIOLETA               //               D5     PUERTA 1 
+       D7                               VERDE                 //               D7     PORTON
+       D8                               AMARILLO
+       3V                               ROJO
+       LED                              BLANCO
+       PULSADOR _ RETORNO               NARANJA
+       NEGATIVO Y PULSADOR              CELESTE Y AZUL
 /////////////////////////////////////////////////////////////////////*/
 
 
@@ -137,11 +152,11 @@ void manejo_tarjeta(){
                    Serial.print("Mensaje : ");
                    contenido.toUpperCase();
                    if (
-                       contenido.substring(1) == "xx xx xx xx" || //Tarjeta Blanca
-                       contenido.substring(1) == "xx xx xx xx" || // Tarjeta Blanca
-                       contenido.substring(1) == "xx xx xx xx" || // Tarjeta Blanca 
-                       contenido.substring(1) == "xx xx xx xx" || //Llavero Azul
-                       contenido.substring(1) == "xx xx xx xx"    //Llavero Azul
+                       contenido.substring(1) == "XX XX XX XX" ||
+                       contenido.substring(1) == "XX XX XX XX" || 
+                       contenido.substring(1) == "XX XX XX XX" || 
+                       contenido.substring(1) == "XX XX XX XX" || 
+                       contenido.substring(1) == "XX XX XX XX" 
                        ) {
                                                   Serial.println("Abiertoo--------------- Bienvenido !!!!");
                                                   Serial.println();
