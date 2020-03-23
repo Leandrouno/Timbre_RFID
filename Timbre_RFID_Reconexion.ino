@@ -50,13 +50,15 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 // Inicializamos la conexion WIFI con el Router
 char ssid[] = "";     // el nombre de tu Red
 char password[] = ""; // la clave de tu Red
-const char  id_chat[]="";
+
+// Initialize Telegram BOT
+const char  id_chat[]="";//ID CHAT
+#define BOTtoken ""  // el token de tu BOT, lo obtenemos de BotFather
 const char respuesta[] = "Timbre" ,alerta[] = "ALERTA *** Intento de Acceso " , iniciado[]="Sistema Iniciado....";
 int BanderaInicio=0, BanderaBoton=0;
 volatile bool BanderaBotonPresionado = false;
 
-// Initialize Telegram BOT
-#define BOTtoken ""  // el token de tu BOT, lo obtenemos de BotFather
+
 
 
 WiFiClientSecure client;
