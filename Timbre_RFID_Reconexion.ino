@@ -30,11 +30,9 @@
        NEGATIVO Y PULSADOR              CELESTE Y AZUL
 /////////////////////////////////////////////////////////////////////*/
 
+//https://github.com/shurillu/CTBot/blob/master/examples/inlineKeyboard/inlineKeyboard.ino
 
-
-#include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
-#include <UniversalTelegramBot.h>
+#include "CTBot.h"
 #include <SPI.h>
 #include <MFRC522.h>
 
@@ -44,81 +42,61 @@
 #define RST_PIN    D3 
 #define RELE       D1   
 #define SS_PIN     D8  
- 
+
+CTBot myBot;
 
 MFRC522 mfrc522(SS_PIN, RST_PIN); 
-// Inicializamos la conexion WIFI con el Router
-char ssid[] = "";     // el nombre de tu Red
-char password[] = ""; // la clave de tu Red
 
-// Initialize Telegram BOT
-const char  id_chat[]="";//ID CHAT
-#define BOTtoken ""  // el token de tu BOT, lo obtenemos de BotFather
-const char respuesta[] = "Timbre" ,alerta[] = "ALERTA *** Intento de Acceso " , iniciado[]="Sistema Iniciado....";
+String ssid = "";   
+String pass = ""; 
+String token = "";
+long id = ;  //chat_id
+
 int BanderaInicio=0, BanderaBoton=0;
 volatile bool BanderaBotonPresionado = false;
 
 
-
-
-WiFiClientSecure client;
-UniversalTelegramBot bot(BOTtoken, client);
-
 void setup() {
+
         pinMode(RELE, OUTPUT);
         digitalWrite(RELE,HIGH);
         Serial.begin(9600);
-        // Establecer el modo WiFi y desconectarse de un AP si fue Anteriormente conectada
-        WiFi.mode(WIFI_STA);
-        WiFi.disconnect();
-        delay(100);
-        // Intentar conectarse a la red
-        Serial.print("Conectando a la Red Wifi: ");
-        Serial.println(ssid);
-        WiFi.begin(ssid, password);        
-        while (WiFi.status() != WL_CONNECTED) {Serial.print("."); delay(500);}        
-        Serial.println("");
-        Serial.println("WiFi conectada");   
-                Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());    
+   
         pinMode(BOTON_PIN, INPUT_PULLUP);
         pinMode(LED_BUILTIN, OUTPUT);
         
         attachInterrupt(BOTON_PIN, BotonPresionado, FALLING);
+  
+        myBot.wifiConnect(ssid, pass);
+  
+        myBot.setTelegramToken(token);
+
+  
+        if (myBot.testConnection()){
+              Serial.println("Conectado a la Red Wifi");
+              digitalWrite(LED_BUILTIN, HIGH);
+              }  else{
+                      Serial.println("Error al Conectar a la Red");
+                      digitalWrite(LED_BUILTIN, LOW);}
+
         SPI.begin();      
         mfrc522.PCD_Init();   
         Serial.println("Aproxime La Tarjeta al Lector...");
         Serial.println();
         pinMode(LED_RFID, OUTPUT);
-        digitalWrite(LED_RFID,LOW);
-        
-        
-      } // Fin Setup
+        digitalWrite(LED_RFID,LOW);             
 
+ 
+} // FIN SETUP
 
-                      
-void loop() { 
-              if (mfrc522.PICC_IsNewCardPresent()){if (mfrc522.PICC_ReadCardSerial()) { manejo_tarjeta();  } }
-              if (BanderaInicio == 0){ mensaje_inicio ();}
-              if ( BanderaBotonPresionado ) {  envio_mensaje ();} 
-              if (WiFi.status() == WL_CONNECTED) {
-                            digitalWrite(LED_BUILTIN, HIGH);
-                                        } else {
-                                                 digitalWrite(LED_BUILTIN, LOW);
-                                                  WiFi.disconnect();
-                                                   delay(100);
-                                                   // Intentar conectarse a la red
-                                                  Serial.print("Conectando a la Red Wifi: ");
-                                                  Serial.println(ssid);
-												  WiFi.begin(ssid, password);        
-												  while (WiFi.status() != WL_CONNECTED) {Serial.print("."); delay(500);}        
-												  Serial.println("");
-												  Serial.println("WiFi conectada");   
-												  		Serial.print("IP address: ");
-												  Serial.println(WiFi.localIP());    
-        
-                                                 }
-              }// FIN LOOP
+void loop() {
+   
+    if (mfrc522.PICC_IsNewCardPresent()){if (mfrc522.PICC_ReadCardSerial()) { manejo_tarjeta();  } }
+    if (BanderaInicio == 0){ mensaje_inicio ();}
+    if ( BanderaBotonPresionado ) {  envio_mensaje ();} 
+
+} //FIN LOOP
+
 
 void BotonPresionado() {    
                         int button = digitalRead(BOTON_PIN);
@@ -126,34 +104,35 @@ void BotonPresionado() {
                           {
                           BanderaBotonPresionado = true; 
                           Serial.println("Boton Presionado");
+                          digitalWrite(LED_RFID, HIGH);
                           BanderaBoton = 1;
                           }                                                    
                         return;
-                       } // FIN  Boton Presionado        
-        
+                       } // FIN  BOTON PRESIONADO 
+             
 void mensaje_inicio (){
-  
                           Serial.println("Iniciado...");
                           Serial.println("Enviando Mensaje de Inicio ....."); 
-                          bot.sendMessage(id_chat, iniciado);
+                          myBot.sendMessage(id, "Sistema Timbre Iniciado....");
                           Serial.println("Mensaje Enviado"); 
                           Serial.println(" "); 
                           BanderaInicio=1;
                           
   
-} // FIN Mensaje de inicio
-        
+} // FIN MENSAJE INICIO
+
+
 void envio_mensaje (){
-                        digitalWrite(LED_RFID, HIGH);
                         Serial.println("Enviando Mensaje.....");  
                         BanderaBotonPresionado = false;
-                        bot.sendMessage(id_chat, respuesta);
+                        myBot.sendMessage(id, "Timbre");
                         Serial.println("Mensaje Enviado");
                         Serial.println(" "); 
                         BanderaBoton = 0;
                         digitalWrite(LED_RFID, LOW);
                                          
-} // FIN Envio de Mensaje    
+} // FIN ENVIO MENSAJE             
+
 
 void manejo_tarjeta(){
                       String contenido= "";
@@ -168,11 +147,11 @@ void manejo_tarjeta(){
                    Serial.print("Mensaje : ");
                    contenido.toUpperCase();
                    if (
-                       contenido.substring(1) == "XX XX XX XX" ||
-                       contenido.substring(1) == "XX XX XX XX" || 
-                       contenido.substring(1) == "XX XX XX XX" || 
-                       contenido.substring(1) == "XX XX XX XX" || 
-                       contenido.substring(1) == "XX XX XX XX" 
+                       contenido.substring(1) == "xx xx xx xx" ||
+                       contenido.substring(1) == "xx xx xx xx" || 
+                       contenido.substring(1) == "xx xx xx xx" || 
+                       contenido.substring(1) == "xx xx xx xx" || 
+                       contenido.substring(1) == "xx xx xx xx" 
                        ) {
                                                   Serial.println("Abiertoo--------------- Bienvenido !!!!");
                                                   Serial.println();
@@ -196,9 +175,10 @@ void manejo_tarjeta(){
                          digitalWrite(LED_RFID, HIGH);
                          delay(100);           
                          digitalWrite(LED_RFID, LOW); 
-                         Serial.println("Mensaje de intento de ingreso Fallido");
+                         Serial.println("Enviando Mensaje de intento de ingreso Fallido");
                          Serial.println();
-                         bot.sendMessage(id_chat, alerta);
+                         myBot.sendMessage(id, "ALERTA *** Intento de Acceso ");
+                         
                         }
 
 }   // FIN MANEJO TARJETA
