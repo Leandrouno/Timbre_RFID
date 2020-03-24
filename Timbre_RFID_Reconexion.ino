@@ -28,6 +28,27 @@
        LED                              BLANCO
        PULSADOR _ RETORNO               NARANJA
        NEGATIVO Y PULSADOR              CELESTE Y AZUL
+	   
+	   
+	   
+	   --------------------------------------------
+	   
+	   
+	               PINERA
+	   
+	   
+	   6  AMARILLO
+	   7  AZUL
+	   8  MARRON
+	   9  VERDE
+	   10 VIOLETA
+	   11 GRIS
+	   12 ROJO
+	   13 BLANCO 
+	   14 CELESTE
+	   15 NARANJA	   
+	   
+	   
 /////////////////////////////////////////////////////////////////////*/
 
 //https://github.com/shurillu/CTBot/blob/master/examples/inlineKeyboard/inlineKeyboard.ino
