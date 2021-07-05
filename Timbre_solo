@@ -1,0 +1,128 @@
+/*//////////////////////// CONEXION///////////////////////////////////
+  
+      Nodemcu       //     RFID-RC522 
+       D3 [1*]      GPIO-0      //     RST/Reset RST  //     Marron
+       D8 [2*]      GPIO-15     //     SPI SS  SDA[3] //     Amarillo 
+       D7           GPIO-13     //     SPI MOSI MOSI  //     Verde
+       D6           GPIO-12     //     SPI MISO MISO  //     Violeta
+       D5           GPIO-14     //     SPI SCK SCK    //     Gris
+       -----------------------------------------------
+       D4           Pulsador                         //   Celeste-Naranja
+       D0           Led_Rfid                         //   Blanco
+       D2           Led_Wifi
+       D1           Rele
+       3v                                            //  Rojo
+       GND                                           // Azul
+       --------------------------------------------
+              PINES DE LA PLAQUETA TIMBRE                     //               PINES DE BOT TELEGRAM                   
+ 
+       D3                               MARRON                //               D1     LED WIFI
+       D5                               GRIS                  //               D2     PUERTA 2    
+       D6                               VIOLETA               //               D5     PUERTA 1 
+       D7                               VERDE                 //               D7     PORTON
+       D8                               AMARILLO
+       3V                               ROJO
+       LED                              BLANCO
+       PULSADOR _ RETORNO               NARANJA
+       NEGATIVO Y PULSADOR              CELESTE Y AZUL
+     
+     
+     
+     --------------------------------------------
+     
+     
+                 PINERA
+     
+     
+     6  AMARILLO
+     7  AZUL
+     8  MARRON
+     9  VERDE
+     10 VIOLETA
+     11 GRIS
+     12 ROJO
+     13 BLANCO 
+     14 CELESTE
+     15 NARANJA    
+     
+     
+/////////////////////////////////////////////////////////////////////*/
+#include "CTBot.h"
+
+#define BOTON_PIN  D4
+#define LED_BUILTIN D2
+
+CTBot myBot;
+
+String ssid = "";   
+String pass = ""; 
+String token = "";
+long id = ;  //chat_id sin comillas
+
+int BanderaInicio=0, BanderaBoton=0;
+volatile bool BanderaBotonPresionado = false;
+
+
+void setup() {
+
+        Serial.begin(9600);
+   
+        pinMode(BOTON_PIN, INPUT_PULLUP);
+        pinMode(LED_BUILTIN, OUTPUT);
+        
+        attachInterrupt(BOTON_PIN, BotonPresionado, FALLING);
+  
+        myBot.wifiConnect(ssid, pass);
+  
+        myBot.setTelegramToken(token);
+
+  
+        if (myBot.testConnection()){
+              Serial.println("Conectado a la Red Wifi");
+              digitalWrite(LED_BUILTIN, HIGH);
+              }  else{
+                      Serial.println("Error al Conectar a la Red");
+                      digitalWrite(LED_BUILTIN, LOW);}
+ 
+} // FIN SETUP
+
+void loop() {
+   
+    if (BanderaInicio == 0){ mensaje_inicio ();}
+    if ( BanderaBotonPresionado ) {  envio_mensaje ();} 
+
+} //FIN LOOP
+
+
+void BotonPresionado() {    
+                        int button = digitalRead(BOTON_PIN);
+                        if(button == LOW && BanderaBoton == 0)
+                          {
+                          BanderaBotonPresionado = true; 
+                          Serial.println("Boton Presionado");
+                          BanderaBoton = 1;
+                          }                                                    
+                        return;
+                       } // FIN  BOTON PRESIONADO 
+             
+void mensaje_inicio (){
+                          Serial.println("Iniciado...");
+                          Serial.println("Enviando Mensaje de Inicio ....."); 
+                          myBot.sendMessage(id, "Sistema Timbre Iniciado....");
+                          Serial.println("Mensaje Enviado"); 
+                          Serial.println(" "); 
+                          BanderaInicio=1;
+                          
+  
+} // FIN MENSAJE INICIO
+
+
+void envio_mensaje (){
+                        Serial.println("Enviando Mensaje.....");  
+                        BanderaBotonPresionado = false;
+                        myBot.sendMessage(id, "Timbre");
+                        Serial.println("Mensaje Enviado");
+                        Serial.println(" "); 
+                        BanderaBoton = 0;
+                                         
+} // FIN ENVIO MENSAJE             
